@@ -13,6 +13,11 @@ const historyList = document.getElementById('history-list');
 const clearHistoryBtn = document.getElementById('clear-history-btn');
 const toggleUploadBtn = document.getElementById('toggle-upload');
 const uploadPanel = document.getElementById('upload-panel');
+// 弹窗元素
+const resultModal = document.getElementById('result-modal');
+const modalBody = document.getElementById('modal-body');
+const closeModal = document.getElementById('close-modal');
+const confirmModal = document.getElementById('confirm-modal');
 
 // 应用状态
 let names = [];
@@ -198,6 +203,65 @@ function setupEventListeners() {
             document.body.classList.remove('scrolling');
         }, 300);
     });
+    
+    // 弹窗关闭按钮
+    closeModal.addEventListener('click', hideResultModal);
+    
+    // 弹窗确认按钮
+    confirmModal.addEventListener('click', hideResultModal);
+    
+    // 点击弹窗外部关闭
+    resultModal.addEventListener('click', (e) => {
+        if (e.target === resultModal) {
+            hideResultModal();
+        }
+    });
+    
+    // ESC键关闭弹窗
+    document.addEventListener('keydown', (e) => {
+        if (e.key === 'Escape' && resultModal.classList.contains('show')) {
+            hideResultModal();
+        }
+    });
+}
+
+// 显示结果弹窗
+function showResultModal(selectedNames) {
+    // 准备弹窗内容
+    modalBody.innerHTML = '';
+    
+    // 添加结果说明
+    const resultInfo = document.createElement('p');
+    resultInfo.textContent = `本次随机点名选中了 ${selectedNames.length} 人：`;
+    modalBody.appendChild(resultInfo);
+    
+    // 创建选中名字列表
+    const namesList = document.createElement('div');
+    namesList.className = 'selected-names-list';
+    
+    // 添加每个选中的名字
+    selectedNames.forEach((name, index) => {
+        const nameItem = document.createElement('div');
+        nameItem.className = 'selected-name-item';
+        nameItem.textContent = name;
+        // 延迟显示，有序出现的动画效果
+        nameItem.style.animationDelay = `${index * 0.1}s`;
+        namesList.appendChild(nameItem);
+    });
+    
+    modalBody.appendChild(namesList);
+    
+    // 显示弹窗
+    resultModal.classList.add('show');
+    
+    // 添加弹窗事件处理
+    document.body.style.overflow = 'hidden'; // 防止背景滚动
+}
+
+// 隐藏结果弹窗
+function hideResultModal() {
+    resultModal.classList.remove('show');
+    document.body.style.overflow = ''; // 恢复背景滚动
 }
 
 // 在名单列表中显示状态信息
@@ -560,6 +624,15 @@ function stopRandomSelection() {
     // 获取选中的项目
     const selectedItems = nameList.querySelectorAll('.name-item.selected');
     
+    // 收集选中的名字
+    const selectedNames = [];
+    selectedItems.forEach(item => {
+        const index = parseInt(item.dataset.index);
+        if (!isNaN(index) && index >= 0 && index < names.length) {
+            selectedNames.push(names[index]);
+        }
+    });
+    
     // 添加高亮动画效果
     selectedItems.forEach(item => {
         item.classList.add('highlight');
@@ -578,6 +651,13 @@ function stopRandomSelection() {
     
     // 记录当前选择到历史记录
     addToHistory();
+    
+    // 显示结果弹窗
+    if (selectedNames.length > 0) {
+        setTimeout(() => {
+            showResultModal(selectedNames);
+        }, 800); // 延迟显示，让用户先看到高亮效果
+    }
     
     // 移除高亮效果
     setTimeout(() => {
