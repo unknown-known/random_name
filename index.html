@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>随机点名系统</title>
+    <link rel="stylesheet" href="styles.css">
+    <!-- 主要CDN源 -->
+    <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
+    <!-- 备用CDN源 -->
+    <script>
+        window.addEventListener('error', function(e) {
+            // 检测主CDN加载失败时，尝试使用备用CDN
+            if (e.target.src && e.target.src.includes('xlsx') && !window.XLSX) {
+                console.log('主要CDN加载失败，尝试备用CDN');
+                var script = document.createElement('script');
+                script.src = "https://unpkg.com/xlsx@0.18.5/dist/xlsx.full.min.js";
+                document.head.appendChild(script);
+            }
+        }, true);
+    </script>
+</head>
+<body>
+    <div class="app-container" id="app">
+        <header>
+            <h1>随机点名系统</h1>
+            <div class="theme-switcher">
+                <span>主题：</span>
+                <select id="theme-select">
+                    <option value="light">浅色</option>
+                    <option value="dark">深色</option>
+                    <option value="colorful">彩色</option>
+                </select>
+            </div>
+        </header>
+
+        <main>
+            <div class="main-content">
+                <div class="left-panel">
+                    <div class="compact-upload-section">
+                        <button id="toggle-upload" class="btn secondary small">
+                            <span class="toggle-icon">➕</span> 上传Excel
+                        </button>
+                        <div id="upload-panel" class="upload-panel" style="display: none;">
+                            <div class="file-upload-container">
+                                <label for="excel-upload" class="file-upload-label">
+                                    <span>选择文件</span>
+                                    <input type="file" id="excel-upload" accept=".xlsx, .xls, .csv" />
+                                </label>
+                                <span id="file-name" class="file-name">未选择文件</span>
+                            </div>
+                            <button id="upload-btn" class="btn primary small" disabled>上传并解析</button>
+                        </div>
+                    </div>
+                    
+                    <div class="name-list-section">
+                        <h2>名单列表 <span id="name-count">(0)</span></h2>
+                        <div id="name-list" class="name-list"></div>
+                        
+                        <div class="control-panel">
+                            <div class="multiple-selection-controls">
+                                <div class="selection-number">
+                                    <label for="select-count">每次选择人数：</label>
+                                    <input type="number" id="select-count" min="1" max="10" value="1" class="number-input">
+                                </div>
+                            </div>
+                            
+                            <div class="control-buttons">
+                                <button id="start-btn" class="btn primary" disabled>开始点名</button>
+                                <button id="stop-btn" class="btn secondary" disabled>停止</button>
+                            </div>
+                        </div>
+                        
+                        <div id="error-message" class="error-message" style="display: none; color: red; margin-top: 10px;"></div>
+                    </div>
+                </div>
+                
+                <div class="right-panel">
+                    <div class="history-section">
+                        <div class="history-header">
+                            <h2>历史记录</h2>
+                            <div class="history-controls">
+                                <button id="clear-history-btn" class="btn secondary small">清空历史</button>
+                            </div>
+                        </div>
+                        <div id="history-list" class="history-list">
+                            <div class="no-history">暂无历史记录</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+
+        <footer>
+            <p>© 2023 随机点名系统 - 保证真随机点名</p>
+        </footer>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html> 
